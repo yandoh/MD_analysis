@@ -1,11 +1,9 @@
 !!
-!! Files to be required !!
-!! (1) sysinfo
-!! (2) seginfo.mdff
-!! (3) massinfo.mdff
-!! (4) template.pdb (with TER, END, angles, and boxes)
-!!
-!! (5) *.dcd file 
+!! Files to be required 
+!! (1) ./sys_info
+!! (2) ./seginfo.mdff  
+!! (3) ./massinfo.mdff  
+!! (4) *.dcd file 
 !!
 	implicit none
 !
