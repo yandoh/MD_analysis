@@ -1,6 +1,7 @@
 !Copyright (c) 2022 Yoshimichi ANDOH
 !Released under the MIT license
 !https://opensource.org/licenses/mit-license.php
+
 !!
 !! Files to be required 
 !! (1) ./sys_info
