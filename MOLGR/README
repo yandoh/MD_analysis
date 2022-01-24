@@ -1,0 +1,16 @@
+Steps in analysis
+
+(1) Prepareation of input file
+
+  ./sys_info ... A file which describes composition of calculation system.
+
+(2) Calculation of g(r) for moleule mass center for each .3x3 file 
+
+  gfortran -O3 molgr.F90 -o ../exe/molgr
+  cat ../COPYS/copied.3x3 | ../exe/molgr > result.gr
+
+(3) Take average over multiple .gr files
+
+  gfortran -O3 avemolgr.F90 -o ../exe/avemolgr
+  cat *.gr | ../exe/avemolgr > molgr.ave
+

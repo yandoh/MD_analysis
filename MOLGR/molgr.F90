@@ -3,7 +3,7 @@
 !https://opensource.org/licenses/mit-license.php
 
 ! === inputs ===
-! (1) ./sysinfo
+! (1) ./sys_info
 ! (2) ./3x3 
 !
 	implicit none
@@ -24,7 +24,7 @@
 	real(8) :: dr,rmax,rmax2
 	integer(4) :: ir,ndr
 	integer(4) :: molcount
-	real(8) :: rho,radius,dvolume,volume
+	real(8) :: rho,radius,dvolume,volume,svolume
 	real(8) :: pi
 !dcd
 	integer(4)::nflame,iflame,rflame
@@ -61,10 +61,9 @@
 !### input copied COM ###!
 	read(*,*) cdum,nflame
 
-        rflame=0
-!	DO iflame=1,1
- 	DO iflame=1,nflame
-          rflame=rflame+1
+      rflame=0
+      DO iflame=1,nflame
+        rflame=rflame+1
 
 !	^^^ input cntmol ^^^
  	do kom=1,komtot
@@ -77,7 +76,8 @@
 	read(*,*) cdum,alpha,beta,gamma
 	read(*,*) cdum,box(1:3)
 
-!       write(1,*) box
+        call cellvolume(box,alpha,beta,gamma,volume)
+	svolume=svolume+volume
 
 !	^^^ calc g(r) ^^^!
  	do komi=1,komtot
@@ -100,36 +100,31 @@
 	enddo ! h
 	enddo ! kom
 
-        call cellvolume(box,alpha,beta,gamma,volume)
-
-	volume=volume+box(1)*box(2) !HH(1,1)*HH(2,2)
-
-	ENDDO ! iflame
+      ENDDO ! iflame
 
 
 !### average over flame ###!
-	hst=hst/dble(rflame)
-	volume=volume/dble(rflame)
+      hst=hst/dble(rflame)
+      svolume=svolume/dble(rflame)
 
 !### calc gr ###!
- 	rho=molcount/volume !(HH(1,1)*HH(2,2))
+      rho=molcount/svolume !(HH(1,1)*HH(2,2))
 
-	do ir=1,ndr
- 	  radius=dr*(ir-0.5d0)
-	  dvolume=(4d0*pi*radius**2)*dr
- 	  gr(ir)=hst(ir)/molcount/(dvolume*rho)  
-	enddo
+      do ir=1,ndr
+ 	radius=dr*(ir-0.5d0)
+	dvolume=(4d0*pi*radius**2)*dr
+ 	gr(ir)=hst(ir)/molcount/(dvolume*rho)  
+      enddo
 
 !###  output  ###
- 	write(*,'(a1,4e22.15)') '#', rho
-!!	write(*,'(f12.5,4e20.10)') 0d0,0d0,0d0,0d0,0d0
-	do ir=1,ndr
- 	  radius=dr*(ir-0.5d0)
-	  write(*,'(f12.5,4e20.10)') radius,gr(ir)
-	enddo
+      write(*,'(a1,2e22.15,i5,i7)') '#', rho, svolume, ndr, rflame
+      do ir=1,ndr
+ 	radius=dr*(ir-0.5d0)
+	write(*,'(f12.5,4e20.10)') radius,gr(ir)
+      enddo
 
-	stop
-	end
+      stop
+      end
 
 !############################################################
         subroutine cellvolume(box,alpha,beta,gamma,volume)
@@ -185,15 +180,6 @@
         cv(3)=box(3)*dsqrt(                                       & 
            dsin(alpha)**2 - (dcos(beta)-dcos(alpha)*dcos(gamma) )**2  &
            /dsin(gamma)**2 )
-!       HH(1,1)=av(1)
-!       HH(2,1)=av(2) ! 0d0
-!       HH(3,1)=av(3) ! 0d0
-!       HH(1,2)=bv(1)
-!       HH(2,2)=bv(2)
-!       HH(3,2)=bv(3) ! 0d0
-!       HH(1,3)=cv(1)
-!       HH(2,3)=cv(2)
-!       HH(3,3)=cv(3)
 
         return
         end
