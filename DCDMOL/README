@@ -24,3 +24,7 @@ Steps in analysis
   gfortran -O3 dcd2moldcd.F90 -o ../exe/dcd2moldcd
   ../exe/dcd2moldcd
 
+  Two new files will be generated: new.dcd, last.pdb
+
+  new.dcd ... converted .dcd file where each molecule shape is recovered.
+  last.pdb ... pdb file with the last trajectory.
