@@ -3,30 +3,27 @@
 !https://opensource.org/licenses/mit-license.php
 
 ! === inputs ===
-! (1) ./sysinfo
+! (1) ./sys_info
 ! (2) ./massinfo.mdff
-! (3) ./dcd
+! (3) ./DCD
 !
-        implicit none
-        integer(4),parameter::ncopy=1
+      implicit none
+      integer(4),parameter::ncopy=1
 !
-	integer(4),allocatable::nav(:),nmv(:)
-	integer(4)::h,i,j,k,l,m,n,komtot,kom,ix,iy,iz
-	real(8)::box(3)
-	real(8)::alpha,beta,gamma
-	real(8),allocatable :: mass(:,:), molmass(:)
-	real(8)::avec(3),bvec(3),cvec(3)
-	integer(4) :: totmol
-	integer(4) :: totnp
-	real(8) :: smass
+      integer(4),allocatable::nav(:),nmv(:)
+      integer(4)::h,i,j,k,l,m,n,komtot,kom,ix,iy,iz
+      real(8)::box(3)
+      real(8)::alpha,beta,gamma
+      real(8),allocatable :: mass(:,:), molmass(:)
+      real(8)::avec(3),bvec(3),cvec(3)
+      integer(4) :: totmol
+      integer(4) :: totnp
+      real(8) :: smass
       real(8) :: HH(3,3), rH(3,3), tHHH(3,3)
-	real(8),allocatable :: pos(:,:,:)
-	real(8),allocatable :: cntmol(:,:,:)
-	real(8),allocatable :: dvecz(:,:)
+      real(8),allocatable :: pos(:,:,:)
+      real(8),allocatable :: cntmol(:,:,:)
       real(8) :: cntlyr(2,3)
-	real(8) :: lx,ly,lz
-	real(8) :: piQ
-	real(8) :: cutr
+      real(8) :: lx,ly,lz
 !dcd
       character(len=4)::Aname
       integer(4) :: nstr, nptot, iflame, nflame
@@ -39,9 +36,6 @@
       nstr=0
       pi=acos(-1d0)
 !dcd
-
-	pi=dacos(-1d0)
-	piQ=pi/4d0
 
 !### input sysinfo ###
 	open(21,file='sys_info')
@@ -62,7 +56,6 @@
 	allocate( mass(komtot,totnp), molmass(komtot) )
 	allocate( pos(3,komtot,totnp) )
 	allocate( cntmol(3,komtot,totmol) )
-	allocate( dvecz(komtot,totmol) )
 	
 !### input mass ###
 	open(3,file='massinfo.mdff')

@@ -1,0 +1,21 @@
+Steps in analysis
+
+(1) Prepareation of input files 
+
+  ./sys_info ... A file which describes composition of calculation system.
+
+  ./massinfo.mdff ... A file which describes mass information 
+                      for each molecule species.
+
+(2) Link of converted .dcd file by dcd2moldcd.F90 as ./DCD
+
+  Ex) ln -s ../DCDMOL/new.dcd ./DCD 
+
+(3) Run analysis 
+
+  gfortran -O3 copy_NxNxN.F90 -o ../exe/copynnn
+  ../exe/copynnn > copied.3x3
+
+
+  copied.3x3 contains coordinates for mass centers of molecules in a calculation 
+  unit cell AND its first neighbor 26 image cells for each flame.
