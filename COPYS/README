@@ -2,20 +2,35 @@ Steps in analysis
 
 (1) Prepareation of input files 
 
+  Create subfolder uner COPYS/, 
+
+    mkdir COPYS/subfolder
+
+  then place the following three files in the subfolder:
+
   ./sys_info ... A file which describes composition of calculation system.
 
   ./massinfo.mdff ... A file which describes mass information 
                       for each molecule species.
 
-(2) Link of converted .dcd file by dcd2moldcd.F90 as ./DCD
+  Note: These files are just the same ones used in DCDMOL folder.
 
-  Ex) ln -s ../DCDMOL/new.dcd ./DCD 
+(2) Link of converted .dcd file by dcd2moldcd.F90, or dcd2moldcd_catddcd,
+    as ./DCD in the subfolder
 
-(3) Run analysis 
+  Ex) ln -s ../../DCDMOL/Butane/new.dcd ./DCD 
+
+(3) Compile the F90 program, and place executable in exe/ folder
 
   gfortran -O3 copy_NxNxN.F90 -o ../exe/copynnn
-  ../exe/copynnn > copied.3x3
 
+(4) Run analysis in the subfolder 
 
-  copied.3x3 contains coordinates for mass centers of molecules in a calculation 
-  unit cell AND its first neighbor 26 image cells for each flame.
+  ../../exe/copynnn > copied.3x3
+
+  copied.3x3 contains coordinates for mass centers of molecules 
+  in a calculation unit cell AND its first neighbor 26 image cells 
+  for each flame.
+
+  Note: Output file name and its extension can be decided arbitrarily. 
+  
