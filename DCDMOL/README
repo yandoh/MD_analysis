@@ -10,6 +10,12 @@ Steps in analysis
 
 (1) Prepareation of input files 
 
+  Create subfolder uner DCDMOL/, 
+
+    mkdir DCDMOL/subfolder
+
+  then place the following three files in the subfolder:
+
   ./sys_info ... A file which describes composition of calculation system.
 
   ./massinfo.mdff ... A file which describes mass information 
@@ -23,23 +29,32 @@ Steps in analysis
                       calculation with deleting characters "nsegment=",
                       "ID=", and "natom=" in the file.
 
-(2) Link of .dcd file to be converted as ./DCD
+(2) Link of .dcd file to be converted as ./DCD in the subfolder
 
   Ex) ln -s npt120K1atm.dcd ./DCD 
 
-(3) Run analysis 
+(3) Compile the F90 program, and place executable in exe/ folder
 
-  gfortran -O3 dcd2moldcd.F90 -o ../exe/dcd2moldcd
-  ../exe/dcd2moldcd
+    gfortran -O3 dcd2moldcd.F90 -o ../exe/dcd2moldcd
 
   or
 
-  gfortran -O3 dcd2moldcd_catdcd.F90 -o ../exe/dcd2moldcd_catdcd
-  ../exe/dcd2moldcd_catdcd
+    gfortran -O3 dcd2moldcd_catdcd.F90 -o ../exe/dcd2moldcd_catdcd
 
-  Then, two new files will be generated: new.dcd, last.pdb
+(3) Run analysis in the subfolder in the subfolder
+
+    cd DCDMOL/subfolder
+
+    ../../exe/dcd2moldcd
+
+  or
+
+    ../../exe/dcd2moldcd_catdcd
+
+  Then, two new files will be generated in the subfolder: 
 
   new.dcd ... converted .dcd file where each molecule shape is recovered.
+
   last.pdb ... pdb file with the last trajectory, used as template for atom                kind information read by VMD.
                e.g.) vmd last.pdb new.dcd
 
