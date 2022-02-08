@@ -87,7 +87,7 @@
 
 	DO iflame=1,icntrl(1)
 !debug
-!!!	write(9,'(a,i10)') '#', iflame
+!!!    write(9,'(a,i10)') '#', iflame
 !debug
 !!	if(mod(iflame,100)==0) write(*,*) 'Converting ',iflame,'-th flame'
 	read(34) cellstr !*1e+10
@@ -193,7 +193,7 @@
         real(8) :: HH(3,3),rH(3,3)
 	real(8) :: tH(3,3), tHHH(3,3)
  	real(8) :: av(3),bv(3),cv(3)
-	real(8) :: wa
+	real(8) :: wa, tmp
 	integer(4) :: i,j,k,l,m,n
 
 !### create HH, rHH, tHHH matrix ###
@@ -209,9 +209,10 @@
                dcos(alpha)*dsin(gamma)**2                         &
               -dcos(gamma)*(dcos(beta)-dcos(alpha)*dcos(gamma))   &
               )
-        cv(3)=box(3)*dsqrt(                                       & 
-               dsin(alpha)**2 - (dcos(beta)-dcos(alpha)*dcos(gamma) )**2  &
-               /dsin(gamma)**2 )
+        tmp=sin(alpha)**2 - &
+        ( cos(beta) - cos(alpha)*cos(gamma) )**2 / sin(gamma)**2
+        cv(3)=box(3)*sqrt(tmp)
+        
         HH(1,1)=av(1)
         HH(2,1)=av(2) ! 0d0
         HH(3,1)=av(3) ! 0d0
