@@ -63,6 +63,10 @@
         do i=1,nline
             read(*,*,end=99) j, datin(1:20)
 !>>unit conversion
+!           datin(7)=datin(7)*1d+30
+!           datin(9)=datin(9)*1d+10
+!           datin(10)=datin(10)*1d+10
+!           datin(11)=datin(11)*1d+10
             datin(8)=datin(8)/atm
             datin(15:20)=datin(15:20)/atm
 !<<unit conversion
@@ -90,26 +94,26 @@
         do kom=1,komtot
           write(*,4) 'Densit=',density(kom), ' [g/cm3], kom=', kom
         enddo
-        write(*,3) 'Volume=',avedat(7), std(7),   ' [m3]'
+        write(*,3) 'Volume=',avedat(7), ' [m3]    ',  std(7)
 !
-        write(*,3) '|a|   =',avedat(9), std(9),   ' [m]'
-        write(*,3) '|b|   =',avedat(10), std(10), ' [m]'
-        write(*,3) '|c|   =',avedat(11), std(11), ' [m]'
-        write(*,3) 'alpha =',avedat(12), std(12), ' [deg]'
-        write(*,3) 'beta  =',avedat(13), std(13), ' [deg]'
-        write(*,3) 'gamma =',avedat(14), std(14), ' [deg]'
+        write(*,3) '|a|   =',avedat(9), ' [m]     ',   std(9)
+        write(*,3) '|b|   =',avedat(10),' [m]     ',   std(10) 
+        write(*,3) '|c|   =',avedat(11),' [m]     ',   std(11) 
+        write(*,3) 'alpha =',avedat(12),' [deg]   ', std(12)
+        write(*,3) 'beta  =',avedat(13),' [deg]   ', std(13)
+        write(*,3) 'gamma =',avedat(14),' [deg]   ', std(14)
 !
-        write(*,3) 'Temper=',avedat(6), std(6),   ' [K]'
-        write(*,3) 'Press =',avedat(8), std(8),   ' [atm]'
-        write(*,3) 'Pxx   =',avedat(15), std(15), ' [atm]' 
-        write(*,3) 'Pyy   =',avedat(16), std(16), ' [atm]'
-        write(*,3) 'Pzz   =',avedat(17), std(17), ' [atm]'
-        write(*,3) 'Pxy   =',avedat(18), std(18), ' [atm]'
-        write(*,3) 'Pxz   =',avedat(19), std(19), ' [atm]'
-        write(*,3) 'Pyz   =',avedat(20), std(20), ' [atm]'
-        write(*,3) 'Pot_E =',avedat(2)*jmol, std(2)*jmol, ' [kJ/mol]'
+        write(*,3) 'Temper=',avedat(6), ' [K]     ',   std(6)
+        write(*,3) 'Press =',avedat(8), ' [atm]   ', std(8)
+        write(*,3) 'Pxx   =',avedat(15),' [atm]   ', std(15)
+        write(*,3) 'Pyy   =',avedat(16),' [atm]   ', std(16)
+        write(*,3) 'Pzz   =',avedat(17),' [atm]   ', std(17)
+        write(*,3) 'Pxy   =',avedat(18),' [atm]   ', std(18)
+        write(*,3) 'Pxz   =',avedat(19),' [atm]   ', std(19)
+        write(*,3) 'Pyz   =',avedat(20),' [atm]   ', std(20)
+        write(*,3) 'Pot_E =',avedat(2)*jmol,' [kJ/mol]',std(2)*jmol
 2       format(a,i23,a)
-3       format(a,2es23.15,a)
+3       format(a,es23.15,a,es23.15)
 4       format(a,f23.10,a,i5)
 
         stop
