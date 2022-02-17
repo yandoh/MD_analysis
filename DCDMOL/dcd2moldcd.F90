@@ -216,7 +216,8 @@
 	  ! read !
 	  read(30,*)
 	  do m=1,nav(kom)
-	    read(30,*) massin(m), cdum, atmname(m)
+	    read(30,*) massin(m) !, cdum, atmname(m)
+            call detect_atomkind(massin(m),atmname(m))
 !           write(*,*) atmname(m)
 	  enddo ! m
 	  read(30,*)
@@ -829,3 +830,42 @@
 
         return
       end
+
+      subroutine detect_atomkind(massi,atmname)
+      implicit none
+      real(8)::massi
+      character(4)::atmname
+
+        if (dabs(massi-1.00800d0) .lt. 1.0d-2) then
+           atmname = 'H   '
+        else if (dabs(massi-12.01100d0) .lt. 1.0d-2) then
+           atmname = 'C   '
+        else if (dabs(massi-14.00700d0) .lt. 1.0d-2) then
+           atmname = 'N   '
+        else if (dabs(massi-15.99900d0) .lt. 1.0d-2) then
+           atmname = 'O   '
+        else if (dabs(massi-30.974000d0) .lt. 1.0d-2) then
+           atmname = 'P   '
+        else if (dabs(massi-32.06000d0) .lt. 1.0d-2) then
+           atmname = 'S   '
+        else if (dabs(massi-4.00260d0) .lt. 1.0d-2) then
+           atmname = 'He  '
+        else if (dabs(massi-20.17970d0) .lt. 1.0d-2) then
+           atmname = 'Ne  '
+!       else if (dabs(massi-40.08000d0) .lt. 1.0d-2) then
+!          atmname = 9
+!       else if (dabs(massi-65.37000d0) .lt. 1.0d-2) then
+!          atmname = 10
+!       else if (dabs(massi-55.84700d0) .lt. 1.0d-2) then
+!          atmname = 11
+        else if (dabs(massi-22.98977d0) .lt. 1.0d-2) then
+           atmname = 'SOD '
+        else if (dabs(massi-35.45000d0) .lt. 1.0d-2) then
+           atmname = 'CLA '
+        else if (dabs(massi-39.102000d0) .lt. 1.0d-2) then
+           atmname = 'POT '
+        else
+           atmname = 'X   '
+        endif
+      
+      end subroutine
