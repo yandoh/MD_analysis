@@ -1,11 +1,13 @@
         implicit none
         real(8),parameter :: atm=1.013d+5
-        integer(4),parameter::nline=500000        !! Number of data lines in .mdmntr file
-        real(8),parameter :: avonum=6.0221409d+23 !! The Avogadro constant
+!! Number of data lines in .mdmntr file
+        integer(4),parameter::nline=500000        
+!! The Avogadro constant
+        real(8),parameter :: avonum=6.0221409d+23 
 !
         integer(4),allocatable :: nav(:), nmv(:)
         real(8),allocatable :: molmass(:)
-        real(8),allocatable :: vmole(:), density(:), jmol(:)
+        real(8),allocatable :: vmole(:), density(:), kjmol(:)
 !
         integer(4) :: kom, komtot
         integer(4) :: molcount
@@ -28,12 +30,12 @@
         enddo
 	close(21)
 
-	allocate( vmole(komtot), density(komtot), jmol(komtot) )
+	allocate( vmole(komtot), density(komtot), kjmol(komtot) )
         allocate(molmass(komtot))
 
         do kom=1,komtot
           vmole(kom)=dble(nmv(kom))/avonum
-          jmol(kom)=1d0/vmole(kom)*1d-3
+          kjmol(kom)=1d0/vmole(kom)*1d-3
 	enddo
         
 !### input massinfo ###
@@ -63,16 +65,15 @@
         do i=1,nline
             read(*,*,end=99) j, datin(1:20)
 !>>unit conversion
-!           datin(7)=datin(7)*1d+30
-!           datin(9)=datin(9)*1d+10
-!           datin(10)=datin(10)*1d+10
-!           datin(11)=datin(11)*1d+10
+            datin(7) =datin(7) *1d+30
+            datin(9) =datin(9) *1d+10
+            datin(10)=datin(10)*1d+10
+            datin(11)=datin(11)*1d+10
             datin(8)=datin(8)/atm
             datin(15:20)=datin(15:20)/atm
 !<<unit conversion
             avedat(:)=avedat(:)+datin(:)
             avedat2(:)=avedat2(:)+datin(:)**2
-!               write(*,*) i,j
             nlall=nlall+1
         enddo
         nfiles=nfiles+1
@@ -86,35 +87,36 @@
         std=sqrt(dev)
 
         do kom=1,komtot
-          density(kom)=vmole(kom)*molmass(kom)/avedat(7) * 1d-6
+          density(kom)=vmole(kom)*molmass(kom)/avedat(7) * 1d-6 * 1d+30
         enddo
 
         write(*,2) 'Tlines=',nlall
         write(*,2) 'NFiles=',nfiles
         do kom=1,komtot
-          write(*,4) 'Densit=',density(kom), ' [g/cm3], kom=', kom
+          write(*,4) 'Density=',density(kom), ' [g/cm3], kom=', kom
         enddo
-        write(*,3) 'Volume=',avedat(7), ' [m3]    ',  std(7)
+        write(*,3) 'Volume =',avedat(7), ' [A3]    ',  std(7)
 !
-        write(*,3) '|a|   =',avedat(9), ' [m]     ',   std(9)
-        write(*,3) '|b|   =',avedat(10),' [m]     ',   std(10) 
-        write(*,3) '|c|   =',avedat(11),' [m]     ',   std(11) 
-        write(*,3) 'alpha =',avedat(12),' [deg]   ', std(12)
-        write(*,3) 'beta  =',avedat(13),' [deg]   ', std(13)
-        write(*,3) 'gamma =',avedat(14),' [deg]   ', std(14)
+        write(*,3) '|a|    =',avedat(9), ' [A]     ',   std(9)
+        write(*,3) '|b|    =',avedat(10),' [A]     ',   std(10) 
+        write(*,3) '|c|    =',avedat(11),' [A]     ',   std(11) 
+        write(*,3) 'alpha  =',avedat(12),' [deg]   ', std(12)
+        write(*,3) 'beta   =',avedat(13),' [deg]   ', std(13)
+        write(*,3) 'gamma  =',avedat(14),' [deg]   ', std(14)
 !
-        write(*,3) 'Temper=',avedat(6), ' [K]     ',   std(6)
-        write(*,3) 'Press =',avedat(8), ' [atm]   ', std(8)
-        write(*,3) 'Pxx   =',avedat(15),' [atm]   ', std(15)
-        write(*,3) 'Pyy   =',avedat(16),' [atm]   ', std(16)
-        write(*,3) 'Pzz   =',avedat(17),' [atm]   ', std(17)
-        write(*,3) 'Pxy   =',avedat(18),' [atm]   ', std(18)
-        write(*,3) 'Pxz   =',avedat(19),' [atm]   ', std(19)
-        write(*,3) 'Pyz   =',avedat(20),' [atm]   ', std(20)
-        write(*,3) 'Pot_E =',avedat(2)*jmol,' [kJ/mol]',std(2)*jmol
+        write(*,3) 'Temp   =',avedat(6), ' [K]     ',   std(6)
+        write(*,3) 'Press  =',avedat(8), ' [atm]   ', std(8)
+        write(*,3) 'Pxx    =',avedat(15),' [atm]   ', std(15)
+        write(*,3) 'Pyy    =',avedat(16),' [atm]   ', std(16)
+        write(*,3) 'Pzz    =',avedat(17),' [atm]   ', std(17)
+        write(*,3) 'Pxy    =',avedat(18),' [atm]   ', std(18)
+        write(*,3) 'Pxz    =',avedat(19),' [atm]   ', std(19)
+        write(*,3) 'Pyz    =',avedat(20),' [atm]   ', std(20)
+        write(*,3) 'Pot_E  =',avedat(2)*kjmol,' [kJ/mol]',std(2)*kjmol
 2       format(a,i23,a)
-3       format(a,es23.15,a,es23.15)
-4       format(a,f23.10,a,i5)
+!3       format(a,es23.15,a,es23.15)
+3       format(a,f23.6,a,f23.6)
+4       format(a,f23.6,a,i5)
 
         stop
         end
