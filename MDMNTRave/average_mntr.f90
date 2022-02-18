@@ -19,8 +19,9 @@
         real(8) :: dev(20), std(20)
 
 !### input sysinfo ###
+!! 系の分子構成ファイルの読み込み
         molcount=0
-	open(21,file='sys_info')
+	open(21,file='sys_info',status='old')
         read(21,*) ! skip
  	read(21,*) komtot
  	allocate( nav(komtot), nmv(komtot) )
@@ -39,7 +40,8 @@
 	enddo
         
 !### input massinfo ###
-        open(1,file='./massinfo.mdff')    !! 質量情報ファイルの読み込み
+!! 質量情報ファイルの読み込み
+        open(1,file='./massinfo.mdff',status='old')  
         molmass=0d0
         do kom=1,komtot
 	read(1,*)

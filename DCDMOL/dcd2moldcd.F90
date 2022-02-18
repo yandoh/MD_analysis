@@ -10,22 +10,17 @@
 !! (4) *.dcd file 
 !!
 	implicit none
-!
-!       integer(4),parameter::nsolv=4    !! ions,water
-!
 	real(8),allocatable::pos(:,:), xyz(:,:),vel(:,:)
 	character(4),allocatable::header(:)
 	character(4),allocatable::atmname(:)
 	character(4),allocatable::resname(:)
 	integer(4),allocatable::resnum(:)
 	integer(4),allocatable::nav(:),nmv(:),nsegv(:)
-	character(1) :: cdum
-        character(4) :: atomname
 	integer(4)::k0,L0,j0
-	integer(4)::h,h0,i,j,k,l,m,n,komtot,kom,navmax
+	integer(4)::h,h0,i,k,j,l,m,n,komtot,kom,navmax
 	real(8)::box(3), wa(3)
 	real(8)::alpha,beta,gamma
-        integer(4) :: numseg, idum, idum2, idum3, ierr
+        integer(4) :: numseg, idum, idum2, idum3
 	integer(4),allocatable :: memseg(:),memsegin(:)
 	integer(4),allocatable :: sumseg(:),sumsegin(:)
 	integer(4),allocatable :: topseg(:),topsegin(:)
@@ -34,24 +29,19 @@
 	real(8),allocatable :: cntmol(:,:), dmol(:,:)
 	real(8),allocatable :: scntmol(:,:)
 	real(8),allocatable :: mass(:),massin(:)
-	real(8) :: cntlay(3), acmcom(3)
-	real(8) :: smass,acmmass
+	real(8) :: smass
 	real(8),allocatable :: molmass(:)
 	real(8) :: sum(3),ave(3)
 	real(8) :: pai, radi
 	real(8) :: av(3),bv(3),cv(3), HH(3,3), rH(3,3)
 	real(8) :: sxij,syij,szij
-	integer(4) :: isum,isumplus,nl
+	integer(4) :: isum,isumplus
 	integer(4) :: ksum
 	integer(4) :: atmsum, molnum
 	integer(4) :: imol,jmol
 	integer(4) :: hsum,totmol,totatm
 	integer(4) :: imem
 	integer(4),allocatable :: seg2mol(:), seg2kom(:)
-	character(3)::TER
-	real(8)::dx,dy,dz
-	real(8)::vss(5),vssb(5),rss(5),rssb
-	integer(4)::nnhc
 !dcd
       character(len=4)::Aname
       integer(4) :: nstr, nptot, iflame
@@ -66,7 +56,7 @@
 !dcd
 
 !### input sysinfo ###
-  	open(21,file='sys_info')
+  	open(21,file='sys_info',status='old')
         read(21,*)
  	read(21,*) komtot
   	allocate( nav(komtot), nmv(komtot), nsegv(komtot) )
@@ -100,7 +90,7 @@
 !       stop
 
 !### input seginfo.mdff ###
-	open(20,file='seginfo.mdff')
+	open(20,file='seginfo.mdff',status='old')
 	numseg=0
 	do kom=1,komtot
 	  read(20,*) ! skip tag <segments>
@@ -131,7 +121,7 @@
  	scntseg=0d0
 
 
-	open(20,file='seginfo.mdff')
+	open(20,file='seginfo.mdff',status='old')
 
 	k=0;L=0
 	DO kom=1,komtot
@@ -211,7 +201,7 @@
 	enddo
 
 !### input massinfo ###
- 	open(30,file='massinfo.mdff')  !! copied from mdff
+ 	open(30,file='massinfo.mdff',status='old')  !! copied from mdff
 	do kom=1,komtot
 	  ! read !
 	  read(30,*)
@@ -237,66 +227,15 @@
 	enddo ! kom
  	close(30)
 
-!stop
-
-!### input template.pdb ###
-!	open(30,file='template.pdb')
-! 	read(30,*) ! skip header
-!	do kom=1,komtot
-!	  isum=0
-!	  if(kom.ge.2)then
-!	    do j=1,kom-1
-!	      isum=isum+nmv(j)*nav(j)
-!	    enddo
-!	  endif
-!	  do h=1,nmv(kom)
-!	  i=(h-1)*nav(kom)+isum
-!	  do m=1,nav(kom)
-!	    read(30,110) header(i+m), &
-!               atmname(i+m), resname(i+m), resnum(i+m) !, (pos(k,i+m),k=1,3)
-!	  enddo
-!110	format(a4,7x,1x,a4,1x,a4,1x,i4)
-	! read(30,*) TER ! skip TER
-	! if(TER.ne.'TER') stop'no TER in template.pdb'
-!	  enddo
-!	enddo
-!	close(30)
-
-!### input xyz file ###
-!	read(*,*) n 
-!	if(n.ne.totatm) stop'ERROR :: n.ne.totatm in xyz file !!'
-!	do i=1,n
-!	  read(*,*) (xyz(k,i),k=1,3)
-!	enddo
-!	read(*,*) alpha,beta,gamma
-!	read(*,*) box
-
-!### input xyz.bin file ###
-!	open(33,file='./mdxyzbin',form='unformatted')
-!	read(33) n
-!	if(n.ne.totatm) stop'ERROR :: n.ne.totatm in xyz file !!'
-!	read(33)  xyz(1,:),xyz(2,:),xyz(3,:),vel
-!	read(33) nnhc
-!	read(33) rss,vss
-!	read(33) nnhc
-!	read(33) rssb,vssb
-!	read(33) box(1),box(2),box(3),alpha,beta,gamma
-!	close(33)
-!	xyz=xyz*1.D+10
-!	box=box*1.D+10
-
-!	write(*,*) box
-!	write(*,*) alpha,beta,gamma
-
 !### input .dcd file ###
-	open(34,file='./DCD',form='unformatted')
+	open(34,file='./DCD',form='unformatted',status='old')
 	read(34) Aname,icntrl
 	read(34) nstr
 	read(34) nptot
         allocate( flpx(nptot),flpy(nptot),flpz(nptot) )
 
 !### output .dcd file ###
-	open(35,file='./new.dcd',form='unformatted')
+	open(35,file='./new.dcd',form='unformatted',status='replace')
 	write(35) Aname,icntrl
 	write(35) nstr
 	write(35) nptot
@@ -613,7 +552,7 @@
 
       if(iflame==icntrl(1))then
 !### output last.pdb ###
- 	open(31,file='last.pdb')
+ 	open(31,file='last.pdb',status='replace')
         write(31,'(a6,3f9.3,3f7.3)') 'CRYST1', &
         box(1),box(2),box(3),alpha/radi,beta/radi,gamma/radi
 	h0=0
@@ -786,7 +725,7 @@
         integer(4)::nmv(komtot)
         real(8) :: HH(3,3), rH(3,3)
 !
-        integer(4)::KOM,hsum,L,h,k,j
+        integer(4)::KOM,hsum,L,h
         real(8)::blycnt(3)
         real(8)::totmss
 
