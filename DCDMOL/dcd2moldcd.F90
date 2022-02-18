@@ -17,7 +17,7 @@
 	integer(4),allocatable::resnum(:)
 	integer(4),allocatable::nav(:),nmv(:),nsegv(:)
 	integer(4)::k0,L0,j0
-	integer(4)::h,h0,i,k,j,l,m,n,komtot,kom,navmax
+	integer(4)::h,h0,i,j,k,l,m,n,komtot,kom,navmax
 	real(8)::box(3), wa(3)
 	real(8)::alpha,beta,gamma
         integer(4) :: numseg, idum, idum2, idum3
@@ -487,7 +487,6 @@
 	ENDDO
 
       call  PBC_cntmol(komtot,totmol,cntmol,rH,HH,nmv)
-!     call  reset_z0(komtot,totmol,cntmol,rH,HH,molmass,nmv,nsolv)
 
 !=== recovery of pos ===!
         DO KOM=1,komtot
@@ -513,31 +512,6 @@
 
 	ENDDO ! KOM
 
-!99	continue
-!### output pdb with TER and END ###
-!       do kom=1,komtot
-!	  isum=0
-!	  if(kom.ge.2)then
-!	    do j=1,kom-1
-!	      isum=isum+nmv(j)*nav(j)
-!	    enddo
-!	  endif
-
-!       do h=1,nmv(kom)
-!       i=(h-1)*nav(kom)+isum
-!       do m=1,nav(kom)
-!         write(*,111) header(i+m), i+m, &
-!         atmname(i+m), resname(i+m), resnum(i+m), (pos(k,i+m),k=1,3)
-!       enddo
-!       write(*,'(a3)') 'TER'
-!       enddo
-!       enddo
-!	write(*,'(a3)') 'END'
-!	write(*,*) alpha,beta,gamma
-!	write(*,*) box
-!	write(*,*) n
-!111	format(a4,i7,1x,a4,1x,a4,i5,4x,3f8.3)
-
         do i=1,nptot
           flpx(i)=pos(1,i)
           flpy(i)=pos(2,i)
@@ -547,8 +521,6 @@
 	write(35) (flpx(i),i=1,nptot)
 	write(35) (flpy(i),i=1,nptot)
 	write(35) (flpz(i),i=1,nptot)
-
-99	continue
 
       if(iflame==icntrl(1))then
 !### output last.pdb ###
@@ -595,11 +567,7 @@
         det=HH(1,1)*( HH(2,2)*HH(3,3)-HH(2,3)*HH(3,2) )  &
            -HH(1,2)*( HH(2,1)*HH(3,3)-HH(2,3)*HH(3,1) )  &
            +HH(1,3)*( HH(2,1)*HH(3,2)-HH(2,2)*HH(3,1) )  
-!       det=HH(1,3)*( HH(2,1)*HH(3,2)-HH(2,2)*HH(3,1) )  &
-!          +HH(2,3)*( HH(3,1)*HH(1,2)-HH(3,2)*HH(1,1) )  &
-!          +HH(3,3)*( HH(1,1)*HH(2,2)-HH(1,2)*HH(2,1) )
         if(det.eq.0d0) stop 'det = 0'
-!       write(*,*) det 
         rdet=1d0/det
 
         rH(1,1)=rdet*( HH(2,2)*HH(3,3)-HH(2,3)*HH(3,2) )
@@ -611,15 +579,6 @@
         rH(3,1)=rdet*( HH(2,1)*HH(3,2)-HH(2,2)*HH(3,1) )
         rH(3,2)=rdet*( HH(3,1)*HH(1,2)-HH(3,2)*HH(1,1) )
         rH(3,3)=rdet*( HH(1,1)*HH(2,2)-HH(1,2)*HH(2,1) )
-
-!       write(*,*)'HH='
-!       do i=1,3
-!       write(*,*) (HH(i,k),k=1,3)
-!       enddo
-!       write(*,*)'rH='
-!       do i=1,3
-!       write(*,*) (rH(i,k),k=1,3)
-!       enddo
 
         return
         end
@@ -716,59 +675,6 @@
 
         return
         end
-
-      subroutine  reset_z0(komtot,totmol,cntmol,rH,HH,molmass,nmv,nsolv)
-        implicit none
-        integer(4)::nsolv,komtot,totmol
-        real(8)::cntmol(3,totmol)
-        real(8)::molmass(totmol)
-        integer(4)::nmv(komtot)
-        real(8) :: HH(3,3), rH(3,3)
-!
-        integer(4)::KOM,hsum,L,h
-        real(8)::blycnt(3)
-        real(8)::totmss
-
-!### calc. com of two bilayers ###!
-        blycnt=0d0
-        totmss=0d0
-        DO KOM=1,komtot-nsolv
-        
-          hsum=0
-          if(KOM.ge.2)then
-            do L=1,KOM-1
-              hsum=hsum+nmv(L)
-            enddo
-          endif
-
-          do h=1,nmv(KOM)
-        blycnt(:)=blycnt(:)+molmass(KOM)*cntmol(:,h+hsum)
-        totmss=totmss+molmass(KOM)
-          enddo !h
-
-        ENDDO
-
-        blycnt=blycnt/totmss
-
-!### reset z0 ###!
-        DO KOM=1,komtot
-
-          hsum=0
-          if(KOM.ge.2)then
-            do L=1,KOM-1
-              hsum=hsum+nmv(L)
-            enddo
-          endif
-          do h=1,nmv(KOM)
-        cntmol(3,h+hsum)=cntmol(3,h+hsum)-blycnt(3)
-          enddo !h
-
-        ENDDO
-
-      call  PBC_cntmol(komtot,totmol,cntmol,rH,HH,nmv)
-
-        return
-      end
 
       subroutine detect_atomkind(massi,atmname)
       implicit none
