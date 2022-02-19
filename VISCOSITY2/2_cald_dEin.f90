@@ -1,3 +1,6 @@
+!Copyright (c) 2022 Yoshimichi ANDOH
+!Released under the MIT license
+!https://opensource.org/licenses/mit-license.php
 
         implicit none
         real(8),parameter :: dt=2d-15
