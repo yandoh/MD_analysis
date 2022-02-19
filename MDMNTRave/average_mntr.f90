@@ -1,9 +1,20 @@
+!Copyright (c) 2022 Yoshimichi ANDOH
+!Released under the MIT license
+!https://opensource.org/licenses/mit-license.php
+
+!!
+!! Files to be required 
+!! (1) ./sys_info
+!! (2) ./massinfo.mdff  
+!! (3) *.mdmntr files  (stdin)
+!!
         implicit none
-        real(8),parameter :: atm=1.013d+5
 !! Number of data lines in .mdmntr file
         integer(4),parameter::nline=500000        
 !! The Avogadro constant
         real(8),parameter :: avonum=6.0221409d+23 
+!! Unit conversion
+        real(8),parameter :: atm=1.013d+5
 !
         integer(4),allocatable :: nav(:), nmv(:)
         real(8),allocatable :: molmass(:)
@@ -44,12 +55,12 @@
         open(1,file='./massinfo.mdff',status='old')  
         molmass=0d0
         do kom=1,komtot
-	read(1,*)
+	read(1,*) ! skip <mass>
         do h=1,nav(kom)
           read(1,*) massin
           molmass(kom)=molmass(kom)+massin
         enddo
-	read(1,*)
+	read(1,*) ! skip </mass>
         enddo
         close(1)
 
