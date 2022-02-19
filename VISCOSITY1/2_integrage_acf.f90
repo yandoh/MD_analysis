@@ -1,3 +1,7 @@
+!Copyright (c) 2022 Yoshimichi ANDOH
+!Released under the MIT license
+!https://opensource.org/licenses/mit-license.php
+
         real(8), parameter :: dt=2e-15
 !       integer(4), parameter :: imax=10000000
 !       integer(4), parameter :: imax=5000000  ! 10ns

@@ -1,3 +1,7 @@
+!Copyright (c) 2022 Yoshimichi ANDOH
+!Released under the MIT license
+!https://opensource.org/licenses/mit-license.php
+
         use omp_lib
 	implicit none
         integer(4)::nomp=1,iam=0
