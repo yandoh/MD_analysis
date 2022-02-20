@@ -1,0 +1,19 @@
+Steps in analysis
+
+(1) Prepareation of input file
+
+  ./sys_info ... A file which describes composition of calculation system.
+
+  ./massinfo.mdff ... A file which describes mass information 
+                      for each molecule species.
+                      This file is extracted from .mdff file used in MD  
+                      calculation.
+
+  ./DCD ... link for .dcd file by catdcd.
+
+(2) Calculation of self diffusion coefficient D.
+
+  gfortran -O3 SelfD_sa.F90 -o ../exe/SelfD
+  ln -s (path for .dcd file)/aaa.dcd ./DCD
+  ../exe/SelfD > result.selfd
+  
