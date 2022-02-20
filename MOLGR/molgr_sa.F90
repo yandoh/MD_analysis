@@ -94,8 +94,13 @@
 	enddo
 	enddo
 
-!### input .dcd file & analyse hst(r) ###
-      open(34,file='./DCD',form='unformatted',status='old')
+!### output log ###
+      open(10,file='log',status='replace')
+      write(10,*) komtot
+      write(10,*) molmass
+
+!### input .dcd file & analyze hst(r) ###
+      open(34,file='DCD',form='unformatted',status='old')
       read(34) Aname,icntrl
       read(34) nstr
       read(34) nptot
@@ -132,17 +137,8 @@
       alpha=acos(alpha)   ! rad
       beta =acos(beta)    ! rad
       gamma=acos(gamma)   ! rad
-!     alpha=alpha/180d0*pi
-!     beta =beta /180d0*pi
-!     gamma=gamma/180d0*pi
-!	write(*,*) alpha,beta,gamma;stop
 
       call createvectors(box,alpha,beta,gamma,avec,bvec,cvec)
-!     call creatematrix(  &
-!               box,alpha,beta,gamma,HH,rH,tHHH)
-!avec(:)=HH(:,1)
-!bvec(:)=HH(:,2)
-!cvec(:)=HH(:,3)
 
 !### calc. COM ###
 	cntmol0=0d0
@@ -171,7 +167,6 @@
  	enddo ! kom
 
         call cellvolume(avec,bvec,cvec,volume)
-!       call cellvolume(box,alpha,beta,gamma,volume)
 	svolume=svolume+volume
 
 !	^^^ calc hst(r) ^^^!
@@ -195,11 +190,12 @@
 	enddo ! h
 	enddo ! kom
 
-        write(1,*) iflame, '-th flame analized.'
-        call flush(1)
+        write(10,*) iflame, '-th flame analyzed/', nflame
+        call flush(10)
       ENDDO ! iflame
 
       close(34)
+      close(10)
 
 !### average over flame ###!
       hst=hst/dble(nflame)
@@ -226,14 +222,11 @@
 
 !############################################################
         subroutine cellvolume(av,bv,cv,volume)
+!########################################################################
         implicit none
-!       real(8)::box(3),alpha,beta,gamma,volume
-!       real(8),parameter::pi=dcos(-1d0)
         real(8)::av(3),bv(3),cv(3),volume
         real(8)::bvcv(3), avdotbvcv
         integer(4)::k
-
-!       call createvectors(box,alpha,beta,gamma,av,bv,cv)
 
         bvcv(1)=bv(2)*cv(3)-bv(3)*cv(2)
         bvcv(2)=bv(3)*cv(1)-bv(1)*cv(3)
@@ -273,4 +266,4 @@
            /dsin(gamma)**2 )
 
         return
-        end
+        end subroutine createvectors
