@@ -4,11 +4,10 @@
 
         real(8), parameter :: dt=2e-15
 !       integer(4), parameter :: imax=5000000  ! 10ns
-        integer(4), parameter :: imax=2500000  ! 5ns
-!       integer(4), parameter :: imax=1000000   ! 2ns
+!       integer(4), parameter :: imax=2500000  ! 5ns
+        integer(4), parameter :: imax=1500000  ! 3ns
+!       integer(4), parameter :: imax=1000000  ! 2ns
 !       integer(4), parameter :: imax=500000   ! 1ns
-!       integer(4), parameter :: imax=2500000
-!       integer(4), parameter :: imax=1500000
         !
         integer(4) :: ndat
         integer(4) :: i,j,k
@@ -31,8 +30,10 @@
         allocate(Ct(6,ndat),nhit(ndat))
         do i=1,ndat
           read(*,*) j, Ct(1:6,i), nhit(i)
+!simple rule
          !sekibun(:)=sekibun(:)+dt*Ct(:,i)
          !sekibun_nond=sekibun_nond+dt*(Ct(4,i)+Ct(5,i)+Ct(6,i))
+!trapezoidal rule
           if(i==1 .or. i==imax)then
             sekibun(:)=sekibun(:)+0.5d0*dt*Ct(:,i)
             sekibun_nond=sekibun_nond+0.5d0*dt*(Ct(4,i)+Ct(5,i)+Ct(6,i))

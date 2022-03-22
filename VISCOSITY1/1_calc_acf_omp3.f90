@@ -6,9 +6,9 @@
 	implicit none
         integer(4)::nomp=1,iam=0
 	integer(4)::i,j,k,il
-        real(8),parameter :: Temp=289.95d0     ! 温度 [K] 
+        real(8),parameter :: Temp=298.15d0     ! 温度 [K] 
         integer(4),parameter :: iskip=100      ! t0のスキップ頻度
-        integer(4),parameter::nfiles=20        ! 読み込みファイル数(配列allocateに利用)
+        integer(4),parameter::nfiles=50        ! 読み込みファイル数(配列allocateに利用)
         integer(4),parameter::nlperfile=500000 ! .mdmntrファイルの行数(MDステップ数)
 	integer(4),parameter::nlines=nlperfile*nfiles
 	real(8),parameter :: kB=1.380649d-23   ! Bolzman constant [J K−1] 
