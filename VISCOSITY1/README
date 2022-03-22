@@ -1,0 +1,15 @@
+Steps in analysis
+
+(1) Calculation of acf for each element of pressure tensor described in .mdmntr file.
+
+  gfortran -fopenmp 1_calc_acf_omp3.f90 -o ../exe/acfPab
+  cat *.mdmntr | ../exe/acfPab > result.acf
+
+(2) Integrage acf for non-diagonal part of pressure tensor.
+
+  gfortran 2_integrage_acf.f90 -o ../exe/acfintg
+  cat result.acf | ../exe/acfintg > result.intg
+
+Note:
+ Long-time tail of acf should be integrated analytically.
+
