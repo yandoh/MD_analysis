@@ -2,8 +2,6 @@
 !Released under the MIT license
 !https://opensource.org/licenses/mit-license.php
 
-! Stand alone version of molgr.F90
-!
 ! === inputs ===
 ! (1) ./sys_info
 ! (2) ./massinfo.mdff
@@ -15,8 +13,8 @@
       integer(4)::h,i,k,m,komtot,kom
       integer(4)::komi,komj,hi,hj
       integer(4)::iser
-      real(8)::dx,dy,dz,r2,Rg
-      real(8),allocatable::sRg(:)
+      real(8)::dx,dy,dz,r2,Rg,Ri
+      real(8),allocatable::sRg(:),sRi(:)
       integer(4) :: totnp
       real(8) :: alpha,beta,gamma,box(3)
       integer(4) :: molcount
@@ -38,7 +36,7 @@
         read(21,*) ! skip
  	read(21,*) komtot
  	allocate( nav(komtot), nmv(komtot) )
-        allocate( sRg(komtot) )
+        allocate( sRg(komtot), sRi(komtot) )
         do kom=1,komtot
           read(21,*) nav(kom),nmv(kom)
           molcount=molcount+nmv(kom)
@@ -47,6 +45,7 @@
 	close(21)
 
         sRg=0d0
+        sRi=0d0
 
 !allocate arrays
 	allocate(mass(komtot,totnp), molmass(komtot))
@@ -129,20 +128,24 @@
 	enddo
 	ENDDO
 
-!	^^^ calc Rg ^^^!
+!	^^^ calc Rg, Ri ^^^!
 	DO KOM=1,komtot
 	do h=1,nmv(KOM)
 	  i=(h-1)*nav(KOM)
           Rg=0d0
+          Ri=0d0
 	  do m=1,nav(KOM)
             dx=pos(1,kom,i+m)-cntmol0(1,kom,h)
             dy=pos(2,kom,i+m)-cntmol0(2,kom,h)
             dz=pos(3,kom,i+m)-cntmol0(3,kom,h)
             r2=dx**2+dy**2+dz**2
             Rg=Rg+mass(kom,m)*r2
+            Ri=Ri+r2
 	  enddo
           Rg=Rg/molmass(kom)
+          Ri=Ri/nav(KOM)
           sRg(kom)=sRg(kom)+sqrt(Rg)
+          sRi(kom)=sRi(kom)+sqrt(Ri)
 !!        write(*,*) sqrt(Rg) !; stop
 	enddo
 	ENDDO
@@ -158,12 +161,13 @@
       do KOM=1,komtot
 !!      write(*,*) sRg(kom),nmv(kom)*nflame
         sRg(kom)=sRg(kom)/nmv(kom)/nflame
+        sRi(kom)=sRi(kom)/nmv(kom)/nflame
       enddo
 
 !###  output  ###
       write(*,'(a1,i5,i10)') '#', komtot, nflame
       do kom=1,komtot
-	write(*,'(i5,f23.10)') kom, sRg(kom)
+	write(*,'(i5,2f23.10)') kom, sRg(kom), sRi(kom)
       enddo
 
       stop
