@@ -198,8 +198,8 @@
       enddo ! L
 
 !###  output  ###
-      write(*,'(a1,e22.15,i10,i10,i5)') '#', &
-     &                  svolume, ndr, nflame, natompairs
+      write(*,'(a1,e22.15,2i5,i10)') '#', &
+     &                  svolume, natompairs, ndr, nflame
       write(*,'(a1,99e22.15)') '#', rho
       do ir=1,ndr
  	radius=dr*(ir-0.5d0)
