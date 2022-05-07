@@ -2,7 +2,7 @@
 !Released under the MIT license
 !https://opensource.org/licenses/mit-license.php
 
-! Stand alone version of molgr.F90
+! Stand alone version of partgr.F90
 !
 ! === inputs ===
 ! (1) ./sys_info
@@ -162,12 +162,14 @@
       alpha =cellstr(5)   ! cos(alpha)   by catdcd
       box(3)=cellstr(6)   ! |c|
 
+! by DCDMOL
       alpha=alpha/180d0*pi
       beta =beta /180d0*pi
       gamma=gamma/180d0*pi
-!      alpha=acos(alpha)   ! rad
-!      beta =acos(beta)    ! rad
-!      gamma=acos(gamma)   ! rad
+! by catdcd
+!     alpha=acos(alpha)   ! rad
+!     beta =acos(beta)    ! rad
+!     gamma=acos(gamma)   ! rad
 
       call createvectors(box,alpha,beta,gamma,avec,bvec,cvec)
 
@@ -250,7 +252,7 @@
       enddo
 
 !###  output  ###
-      write(*,'(a1,e22.15,i10,i10)') '#', svolume, ndr, nflame
+      write(*,'(a1,e22.15,2i5,i10)') '#', svolume, nparts, ndr, nflame
       write(*,'(a1,99e22.15)') '#', rho
       do ir=1,ndr
  	radius=dr*(ir-0.5d0)
