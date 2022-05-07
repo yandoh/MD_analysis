@@ -15,6 +15,8 @@
       integer(4)::iser
       real(8)::dx,dy,dz,r2,Rg,Ri
       real(8),allocatable::sRg(:),sRi(:)
+      real(8),allocatable::sRg2(:),sRi2(:)
+      real(8),allocatable::sdvg(:),sdvi(:)
       integer(4) :: totnp
       real(8) :: alpha,beta,gamma,box(3)
       integer(4) :: molcount
@@ -37,6 +39,8 @@
  	read(21,*) komtot
  	allocate( nav(komtot), nmv(komtot) )
         allocate( sRg(komtot), sRi(komtot) )
+        allocate( sRg2(komtot), sRi2(komtot) )
+        allocate( sdvg(komtot), sdvi(komtot) )
         do kom=1,komtot
           read(21,*) nav(kom),nmv(kom)
           molcount=molcount+nmv(kom)
@@ -44,8 +48,8 @@
         enddo
 	close(21)
 
-        sRg=0d0
-        sRi=0d0
+        sRg=0d0; sRg2=0d0
+        sRi=0d0; sRi2=0d0
 
 !allocate arrays
 	allocate(mass(komtot,totnp), molmass(komtot))
@@ -109,7 +113,7 @@
       beta  =cellstr(4)   ! cos(beta)    by catdcd
       alpha =cellstr(5)   ! cos(alpha)   by catdcd
       box(3)=cellstr(6)   ! |c|
-!catdcd
+! by catdcd
       alpha=acos(alpha)   ! rad
       beta =acos(beta)    ! rad
       gamma=acos(gamma)   ! rad
@@ -147,6 +151,8 @@
           sRg(kom)=sRg(kom)+sqrt(Rg)
           sRi(kom)=sRi(kom)+sqrt(Ri)
 !!        write(*,*) sqrt(Rg) !; stop
+          sRg2(kom)=sRg2(kom)+Rg
+          sRi2(kom)=sRi2(kom)+Ri
 	enddo
 	ENDDO
         write(10,*) iflame, '-th flame analyzed/', nflame
@@ -162,12 +168,18 @@
 !!      write(*,*) sRg(kom),nmv(kom)*nflame
         sRg(kom)=sRg(kom)/nmv(kom)/nflame
         sRi(kom)=sRi(kom)/nmv(kom)/nflame
+        sRg2(kom)=sRg2(kom)/nmv(kom)/nflame
+        sRi2(kom)=sRi2(kom)/nmv(kom)/nflame
+        sdvg(kom)=sqrt(sRg2(kom)-sRg(kom)**2)
+        sdvi(kom)=sqrt(sRi2(kom)-sRi(kom)**2)
       enddo
 
 !###  output  ###
       write(*,'(a1,i5,i10)') '#', komtot, nflame
       do kom=1,komtot
-	write(*,'(i5,2f23.10)') kom, sRg(kom), sRi(kom)
+	write(*,'(i5,2f10.3,a,2f10.3,a)') &
+    &               kom, sRg(kom), sRi(kom), &
+    &              " (", sdvg(kom), sdvi(kom), ")"
       enddo
 
       stop
