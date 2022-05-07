@@ -22,11 +22,12 @@
       real(8) :: alpha,beta,gamma,box(3)
       real(8),allocatable :: cntmol(:,:,:,:)
       integer(4) :: isermin0
-      real(8),allocatable :: hst(:),gr(:)
+      real(8),allocatable :: hst(:,:),gr(:,:)
+      real(8),allocatable :: rho(:)
       real(8) :: dr,rmax,rmax2
       integer(4) :: ir,ndr
       integer(4) :: molcount
-      real(8) :: rho,radius,dvolume,volume,svolume
+      real(8) :: radius,dvolume,volume,svolume
       real(8) :: pi
       real(8),allocatable :: mass(:,:), molmass(:)
       integer(4) ix,iy,iz
@@ -67,8 +68,9 @@
 	isermin0=(ncopy+1+ncopy)**3/2+1
 
 !allocate arrays
-	allocate(hst(ndr))
-	allocate(gr(ndr))
+	allocate( hst(ndr,komtot) )
+	allocate( gr(ndr,komtot) )
+	allocate( rho(komtot) )
 	allocate( mass(komtot,totnp), molmass(komtot) )
 	allocate( pos(3,komtot,totnp) )
         allocate( cntmol0(3,komtot,molcount) )
@@ -133,10 +135,14 @@
       beta  =cellstr(4)   ! cos(beta)    by catdcd
       alpha =cellstr(5)   ! cos(alpha)   by catdcd
       box(3)=cellstr(6)   ! |c|
-
-      alpha=acos(alpha)   ! rad
-      beta =acos(beta)    ! rad
-      gamma=acos(gamma)   ! rad
+! by DCDMOL
+      alpha=alpha/180d0*pi
+      beta =beta /180d0*pi
+      gamma=gamma/180d0*pi
+! by catdcd
+!     alpha=acos(alpha)   ! rad
+!     beta =acos(beta)    ! rad
+!     gamma=acos(gamma)   ! rad
 
       call createvectors(box,alpha,beta,gamma,avec,bvec,cvec)
 
@@ -183,7 +189,7 @@
 	  if(rij2.gt.rmax2) cycle
 	    rij=sqrt(rij2)
 	    ir=dint(rij/dr)+1
-	    hst(ir)=hst(ir)+1d0
+	    hst(ir,komi)=hst(ir,komi)+1d0
 	enddo ! h
 	enddo ! kom
 	enddo ! iser
@@ -202,19 +208,24 @@
       svolume=svolume/dble(nflame)
 
 !### calc gr ###!
-      rho=molcount/svolume 
+      do kom=1,komtot
+        rho(kom)=nmv(kom)/svolume 
+      enddo
 
+      do kom=1,komtot
       do ir=1,ndr
  	radius=dr*(ir-0.5d0)
 	dvolume=(4d0*pi*radius**2)*dr
- 	gr(ir)=hst(ir)/molcount/(dvolume*rho)  
+ 	gr(ir,kom)=hst(ir,kom)/nmv(kom)/(dvolume*rho(kom))  
+      enddo
       enddo
 
 !###  output  ###
-      write(*,'(a1,2e22.15,i10,i10)') '#', rho, svolume, ndr, nflame
+      write(*,'(a1,e22.15,2i5,i10)') '#', svolume, komtot, ndr, nflame
+      write(*,'(a1,99e22.15)') '#', rho(1:komtot)
       do ir=1,ndr
  	radius=dr*(ir-0.5d0)
-	write(*,'(f12.5,4e20.10)') radius,gr(ir)
+	write(*,'(f12.5,99e20.10)') radius,gr(ir,1:komtot)
       enddo
 
       stop
