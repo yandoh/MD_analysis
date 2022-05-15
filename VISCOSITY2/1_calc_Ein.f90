@@ -7,22 +7,22 @@
 	integer(4)::i,j,k,il
         integer(4)::iam=0,nomp=1
         real(8),parameter :: dt=2.d-15
-        integer(4),parameter::nfiles=20
-!       integer(4),parameter::nfiles=10
-!       integer(4),parameter::nlperfile=10000
-        integer(4),parameter::nlperfile=500000
+        real(8),parameter :: Temp=298.15d0     ! K
+        integer(4),parameter :: iskip=100      ! t0のスキップ頻度
+        integer(4),parameter::nfiles=50        ! 読み込みファイル数(配列allocateに利用)
+        integer(4),parameter::nlperfile=500000 ! .mdmntrファイルの行数(MDステップ数)
 	integer(4),parameter::nlines=nlperfile*nfiles
-!integer(4),parameter::nlines=10000
+	real(8),parameter :: kB=1.380649d-23   ! Bolzman constant [J K−1]
+!
 	real(8) :: Pab(6,nlines)
         real(8) :: Pab0(6),Pab1(6)
-	real(8) :: dG(6)
+	real(8) :: dG(6),dG2(6)
 	real(8) :: avesPab(6,0:nlines)
         integer(4) :: nhit(0:nlines)
         real(8),allocatable :: avesPab_omp(:,:,:)
         integer(4),allocatable :: nhit_omp(:,:)
+        integer(4)::nfilesin, nlinesin
 	real(8) :: datin(20)
-	real(8) :: kB=1.380649d-23 !J K−1, 
-        real(8) :: Temp=298.15d0   ! K
         real(8) :: kBT, volume, v_kBt
 
 !$      nomp=omp_get_max_threads()
@@ -37,6 +37,7 @@
 	volume=0d0
 	avesPab=0d0
 	nhit=0
+        nfilesin=0
 
 1	continue
         read(*,*,end=99) 
@@ -51,30 +52,35 @@
 	  volume=volume+datin(7)
 	  Pab(1:6,il)=datin(15:20)
         enddo
+        nfilesin=nfilesin+1
+        if(nfilesin .gt. nfiles)then
+          write(*,*) 'ERROR: nfilesin > nfiles, change nfiles value.'
+          stop
+        endif
 	goto 1
 99	continue
 
         volume=volume/dble(il)
 	v_kBt=volume/kBT   !  [m^3/J]
- 	write(*,'(a,2es23.15,i10,f10.3,i5)') "#",volume, &
-     &               v_kBt, il, Temp, nomp
+ 	write(*,'(a,2es23.15,i10,i5,f10.3,i4)') "#",volume, v_kBt, &
+     &   il, nfilesin, Temp, nomp
 
 !! take difference
 !$omp parallel default(none) &
-!$omp private(iam,i,j,k,Pab1,dG) &
+!$omp private(iam,i,j,k,Pab1,dG,dG2) &
 !$omp shared(il,Pab) &
 !$omp shared(nhit_omp,avesPab_omp)
 !$      iam=omp_get_thread_num()
 !$omp do schedule(static,1)
-!!  	do i=1,1
-	do i=1,il-1
+ 	do i=1,il-1,iskip
           dG=0d0
-	  do j=i+1,il
+	  do j=i,il
             k=j-i
 	    Pab1(1:6)=Pab(1:6,j)
             dG(1:6)=dG(1:6)+Pab1(1:6)*dt  !! tanzaku-sekibun
+            dG2(1:6)=dG(1:6)**2
             nhit_omp(k,iam)=nhit_omp(k,iam)+1
-            avesPab_omp(1:6,k,iam)=avesPab_omp(1:6,k,iam)+dG**2
+            avesPab_omp(1:6,k,iam)=avesPab_omp(1:6,k,iam)+dG2(1:6)
 	  enddo
 	enddo
 !$omp end do nowait

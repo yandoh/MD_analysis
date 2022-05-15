@@ -4,7 +4,7 @@
 
         implicit none
         real(8),parameter :: dt=2d-15
-        integer(4) :: nl, nline, nomp, i
+        integer(4) :: nl, nlines, nfiles, nomp, i
         real(8) :: volume, vkbt, temp
         character(1)::dum
         real(8),allocatable::time(:)
@@ -15,13 +15,13 @@
         real(8)::dval(4:6), dnondiag
 
 !###input
-        read(*,*) dum, volume, vkbt, nline, temp, nomp
-        write(1,*) nline
-        allocate(time(nline),val(6,nline)) 
-        allocate(nondiag(nline))
+        read(*,*) dum, volume, vkbt, nlines, nfiles, temp, nomp
+        write(1,*) nlines
+        allocate(time(nlines),val(6,nlines)) 
+        allocate(nondiag(nlines))
 	nondiag=0d0
 !stop
-        do i=1,nline
+        do i=1,nlines
           read(*,*) time(i), val(1:6,i)
           nondiag(i)=sum(val(4:6,i))/3d0
         enddo
@@ -29,9 +29,10 @@
         nl=0
         dval=0d0
         dnondiag=0d0
-        write(*,1) dum, volume, vkbt, nline, temp, nomp
+        write(*,1) &
+     &     dum, volume, vkbt, nlines, nfiles, temp, nomp
 !###take difference
-        do i=1,nline-1
+        do i=1,nlines-1
           nl=nl+1
 !
           diff(4:6)=(val(4:6,i+1)-val(4:6,i))/dt
@@ -42,8 +43,8 @@
 !
           write(*,2) time(i), dnondiag/dble(nl), dval(4:6)/dble(nl)
         enddo
-1       format(a1,2es23.15,i10,f10.2,i5)
-2       format(f15.6,8es23.15)
+1       format(a1,2es23.15,i10,i5,f10.3,i4)
+2       format(f18.3,4es23.15)
 
         stop
         end
