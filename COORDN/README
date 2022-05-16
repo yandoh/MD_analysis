@@ -4,3 +4,5 @@ Steps in analysis
 
   gfortran -O3 coordnum.F90 -o ../exe/coordn
   cat (path for .gr file)/result.gr | ../exe/coordn > result.cdn
+
+Note: The Kirkwood-Buff parameter is also calculated in this program. 
