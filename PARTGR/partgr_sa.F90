@@ -28,14 +28,14 @@
       real(8),allocatable :: partmass(:)
 !
       integer(4) h,i,j,k,L,m,komtot,kom
-      integer(4) hi,hj
+      integer(4) hi,hj,L1,L2,kom1,kom2
       integer(4) iser
       integer(4) npmax
       integer(4) isermin0
       integer(4) ir,ndr
       integer(4) molmax
       integer(4) ix,iy,iz
-      integer(4) nparts
+      integer(4) nparts,id,idparts
       real(8) xij,yij,zij,rij,rij2
       real(8) alpha,beta,gamma,box(3)
       real(8) dr,rmax,rmax2
@@ -51,7 +51,7 @@
 !dcd
 
 !parameter for g(r)
-	rmax=25d0          !! max of r value
+	rmax=40d0          !! max of r value
 	rmax2=rmax*rmax
 	dr=0.1d0           !! delta r
 	ndr=int(rmax/dr)
@@ -105,8 +105,15 @@
         allocate( cntpart0(3,molmax,nparts) )
         allocate( cntpart(3,molmax,nparts,(ncopy+1+ncopy)**3) )
 
-	allocate(hst(ndr,nparts))
-	allocate(gr(ndr,nparts))
+        idparts=0
+        do i=1,nparts
+        do j=i,nparts
+          idparts=idparts+1
+        enddo
+        enddo
+        allocate( rho(idparts) )
+	allocate( hst(ndr,idparts) )
+	allocate( gr(ndr,idparts) )
 	hst=0d0
 	gr=0d0
 
@@ -123,7 +130,7 @@
 !### output log ###
       open(10,file='log',status='replace')
       write(10,*) komtot
-      write(10,*) nparts
+      write(10,*) nparts,idparts
       write(10,*) kom_part
       write(10,*) natoms_in_part
 
@@ -189,11 +196,11 @@
 	ENDDO
 
 !	^^^ record cntpart ^^^
+        do L=1,nparts
+        KOM=kom_part(L)+1
         iser=0
  	do ix=-ncopy,+ncopy ; do iy=-ncopy,+ncopy ; do iz=-ncopy,+ncopy
         iser=iser+1
-        do L=1,nparts
-        KOM=kom_part(L)+1
  	do h=1,nmv(kom)
 	  cntpart(:,h,L,iser)=cntpart0(:,h,L)  &
      &                        +ix*avec(:) + iy*bvec(:) + iz*cvec(:)
@@ -205,24 +212,29 @@
 	svolume=svolume+volume
 
 !	^^^ calc hst(r) ^^^!
-        DO L=1,nparts
-        KOM=kom_part(L)+1
- 	do hi=1,nmv(kom)
+        id=0
+        DO L1=1,nparts
+        DO L2=L1,nparts
+        id=id+1
+        kom1=kom_part(L1)+1
+        kom2=kom_part(L2)+1
+ 	do hi=1,nmv(kom1)
 	do iser=1,isermax
- 	do hj=1,nmv(kom)
- 	    xij=cntpart(1,hj,L,iser)-cntpart(1,hi,L,isermin0)
- 	    yij=cntpart(2,hj,L,iser)-cntpart(2,hi,L,isermin0)
-   	    zij=cntpart(3,hj,L,iser)-cntpart(3,hi,L,isermin0)
+ 	do hj=1,nmv(kom2)
+ 	    xij=cntpart(1,hj,L2,iser)-cntpart(1,hi,L1,isermin0)
+ 	    yij=cntpart(2,hj,L2,iser)-cntpart(2,hi,L1,isermin0)
+   	    zij=cntpart(3,hj,L2,iser)-cntpart(3,hi,L1,isermin0)
 	    rij2=xij**2+yij**2+zij**2
 	  if(rij2==0d0) cycle
 	  if(rij2.gt.rmax2) cycle
 	    rij=sqrt(rij2)
 	    ir=dint(rij/dr)+1
-	    hst(ir,L)=hst(ir,L)+1d0
+	    hst(ir,id)=hst(ir,id)+1d0
 	enddo ! hj
 	enddo ! iser
 	enddo ! hi
-        enddo ! L
+        enddo ! L2
+        enddo ! L1
 
         write(10,*) iflame, '-th flame analyzed/', nflame
         call flush(10)
@@ -236,27 +248,27 @@
       svolume=svolume/dble(nflame)
 
 !### calc gr ###!
-      allocate( rho(nparts) )
-      do L=1,nparts
-        KOM=kom_part(L)+1
-        rho(L)=nmv(KOM)/svolume 
-      enddo
-
-      do L=1,nparts
-        KOM=kom_part(L)+1
-      do ir=1,ndr
- 	radius=dr*(ir-0.5d0)
-	dvolume=(4d0*pi*radius**2)*dr
- 	gr(ir,L)=hst(ir,L)/nmv(KOM)/(dvolume*rho(L))  
-      enddo
-      enddo
+      id=0
+      do L1=1,nparts
+      do L2=L1,nparts
+        id=id+1
+        kom1=kom_part(L1)+1
+        kom2=kom_part(L2)+1
+        rho(id)=nmv(kom2)/svolume 
+        do ir=1,ndr
+ 	  radius=dr*(ir-0.5d0)
+	  dvolume=(4d0*pi*radius**2)*dr
+ 	  gr(ir,id)=hst(ir,id)/nmv(kom1)/(dvolume*rho(id))
+        enddo !ir
+      enddo ! L2
+      enddo ! L1
 
 !###  output  ###
-      write(*,'(a1,e22.15,2i5,i10)') '#', svolume, nparts, ndr, nflame
+      write(*,'(a1,e22.15,2i5,i10)') '#', svolume, idparts, ndr, nflame
       write(*,'(a1,99e22.15)') '#', rho
       do ir=1,ndr
  	radius=dr*(ir-0.5d0)
-	write(*,'(f12.5,99e20.10)') radius,(gr(ir,L),L=1,nparts)
+	write(*,'(f12.5,99e20.10)') radius,(gr(ir,L),L=1,idparts)
       enddo
 
       stop
