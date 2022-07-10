@@ -13,7 +13,8 @@
       integer(4),parameter::ncopy=1
 !
       integer(4),allocatable::nav(:),nmv(:)
-      integer(4)::h,i,k,m,komtot,kom
+      integer(4)::h,i,k,m,komtot,kom,komid,id
+      integer(4),allocatable::label(:,:)
       integer(4)::komi,komj,hi,hj
       integer(4)::iser
       integer(4),parameter :: isermax=(ncopy+1+ncopy)**3
@@ -67,16 +68,25 @@
 
 	isermin0=(ncopy+1+ncopy)**3/2+1
 
+        komid=0
+        do komi=1,komtot
+        do komj=komi,komtot
+          komid=komid+1
+        enddo
+        enddo
+
 !allocate arrays
-	allocate( hst(ndr,komtot) )
-	allocate( gr(ndr,komtot) )
-	allocate( rho(komtot) )
+        allocate( rho(komid) )
+        allocate( label(2,komid) )
+	allocate( hst(ndr,komid) )
+	allocate( gr(ndr,komid) )
 	allocate( mass(komtot,totnp), molmass(komtot) )
 	allocate( pos(3,komtot,totnp) )
         allocate( cntmol0(3,komtot,molcount) )
         allocate( cntmol(3,komtot,molcount,(ncopy+1+ncopy)**3) )
 	hst=0d0
 	gr=0d0
+        label=0
 	
 !### input mass ###
 	open(3,file='massinfo.mdff',status='old')
@@ -161,8 +171,8 @@
 	ENDDO
 
 !	^^^ record cntmol ^^^
-        iser=0
  	do kom=1,komtot
+        iser=0
  	do ix=-ncopy,+ncopy ; do iy=-ncopy,+ncopy ; do iz=-ncopy,+ncopy
         iser=iser+1
  	do h=1,nmv(kom)
@@ -176,10 +186,14 @@
 	svolume=svolume+volume
 
 !	^^^ calc hst(r) ^^^!
+        id=0
  	do komi=1,komtot
+ 	do komj=komi,komtot
+          id=id+1
+          label(1,id)=komi
+          label(2,id)=komj
  	do hi=1,nmv(komi)
-	do iser=1,isermax
- 	do komj=1,komtot
+ 	do iser=1,isermax
  	do hj=1,nmv(komj)
  	    xij=cntmol(1,komj,hj,iser)-cntmol(1,komi,hi,isermin0)
  	    yij=cntmol(2,komj,hj,iser)-cntmol(2,komi,hi,isermin0)
@@ -189,7 +203,7 @@
 	  if(rij2.gt.rmax2) cycle
 	    rij=sqrt(rij2)
 	    ir=dint(rij/dr)+1
-	    hst(ir,komi)=hst(ir,komi)+1d0
+	    hst(ir,id)=hst(ir,id)+1d0
 	enddo ! h
 	enddo ! kom
 	enddo ! iser
@@ -208,24 +222,23 @@
       svolume=svolume/dble(nflame)
 
 !### calc gr ###!
-      do kom=1,komtot
-        rho(kom)=nmv(kom)/svolume 
-      enddo
-
-      do kom=1,komtot
+      do id=1,komid
+      komi=label(1,id)
+      komj=label(2,id)
+      rho(id)=nmv(komj)/svolume 
       do ir=1,ndr
  	radius=dr*(ir-0.5d0)
 	dvolume=(4d0*pi*radius**2)*dr
- 	gr(ir,kom)=hst(ir,kom)/nmv(kom)/(dvolume*rho(kom))  
+ 	gr(ir,id)=hst(ir,id)/nmv(komi)/(dvolume*rho(id))  
       enddo
       enddo
 
 !###  output  ###
-      write(*,'(a1,e22.15,2i5,i10)') '#', svolume, komtot, ndr, nflame
-      write(*,'(a1,99e22.15)') '#', rho(1:komtot)
+      write(*,'(a1,e22.15,i3,i10,i10)') '#',svolume,komid,ndr,nflame
+      write(*,'(a1,99e22.15)') '#', rho(:)
       do ir=1,ndr
  	radius=dr*(ir-0.5d0)
-	write(*,'(f12.5,99e20.10)') radius,gr(ir,1:komtot)
+	write(*,'(f12.5,99e20.10)') radius,(gr(ir,id),id=1,komid)
       enddo
 
       stop
