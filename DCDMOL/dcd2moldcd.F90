@@ -32,7 +32,7 @@
 	real(8) :: smass
 	real(8),allocatable :: molmass(:)
 	real(8) :: sum(3),ave(3)
-	real(8) :: pai, radi
+	real(8) :: radi
 	real(8) :: av(3),bv(3),cv(3), HH(3,3), rH(3,3)
 	real(8) :: sxij,syij,szij
 	integer(4) :: isum,isumplus
@@ -249,6 +249,21 @@
 	read(34) (flpy(i),i=1,nptot)
 	read(34) (flpz(i),i=1,nptot)
 
+        gamma =cellstr(2)   ! cos(gamma)
+        beta  =cellstr(4)   ! cos(beta)
+        alpha =cellstr(5)   ! cos(alpha)
+
+    if(abs(alpha).le.1d0)then  ! cos(angle)
+        alpha=acos(alpha) /radi
+        beta=acos(beta)   /radi
+        gamma=acos(gamma) /radi
+        cellstr(2)=gamma
+        cellstr(4)=beta
+        cellstr(5)=alpha
+    else
+        continue ! alrealy in degree unit.
+    endif
+
 	write(35) cellstr !*1e+10
 
         do i=1,nptot
@@ -294,8 +309,8 @@
 	enddo
 
 !### apply segment based PBC ###
-        pai=dacos(-1d0)
-        radi=pai/180d0
+        pi=dacos(-1d0)
+        radi=pi/180d0
         alpha=alpha*radi
         beta =beta *radi
         gamma=gamma*radi
