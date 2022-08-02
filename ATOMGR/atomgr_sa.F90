@@ -121,9 +121,15 @@
       alpha =cellstr(5)   ! cos(alpha)   by catdcd
       box(3)=cellstr(6)   ! |c|
 
+    if(abs(alpha).le.1d0)then  ! cos(angle)
       alpha=acos(alpha)   ! rad
       beta =acos(beta)    ! rad
       gamma=acos(gamma)   ! rad
+    else  !! [degree]
+      alpha=alpha/180d0*pi
+      beta=beta/180d0*pi
+      gamma=gamma/180d0*pi
+    endif
 
       call createvectors(box,alpha,beta,gamma,avec,bvec,cvec)
       call cellvolume(avec,bvec,cvec,volume)
