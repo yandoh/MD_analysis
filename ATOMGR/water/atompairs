@@ -1,4 +1,4 @@
-3
-0  0  0  0   # O-O
+3            # Number of pairs to be analyzed.
+0  0  0  0   # O-O,  speciesID(i) speciesID(j) atomID(i) atomID(j)
 0  0  0  1   # O-H1
 0  0  1  2   # H1-H2

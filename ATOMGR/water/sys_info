@@ -1,3 +1,3 @@
-mTIP3
-  1                # 分子種数
-  3   4428         # 原子数, 分子数 (分子種0)
+mTIP3              # Label
+  1                # Number of molecule species
+  3   4428         # Number of atoms, Number of molecules (species 1)
