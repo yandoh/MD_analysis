@@ -30,6 +30,7 @@
       real(8)::dx,dy,dz,time
       real(8),allocatable :: pos(:,:,:)
       real(8),allocatable :: cntmol0(:,:,:)
+      real(8) :: pi
 !dcd
       character(len=4)::Aname
       integer(4) :: nstr, nptot, iflame, jflame, dflame, nflame
@@ -41,6 +42,7 @@
       real(8),allocatable::dmsd(:)
       integer(4),allocatable::icount(:,:)
 
+	pi=dacos(-1d0)
 	molcount=0
 	totnp=0
 !### input sysinfo ###
@@ -125,9 +127,15 @@
       alpha =cellstr(5)   ! cos(alpha)   by catdcd
       box(3)=cellstr(6)   ! |c|
 
+    if(abs(alpha).le.1d0)then  ! cos(angle)
       alpha=acos(alpha)   ! rad
       beta =acos(beta)    ! rad
       gamma=acos(gamma)   ! rad
+    else  !! [degree]
+      alpha=alpha/180d0*pi
+      beta=beta/180d0*pi
+      gamma=gamma/180d0*pi
+    endif
 
       call createvectors(box,alpha,beta,gamma,avec,bvec,cvec)
 
