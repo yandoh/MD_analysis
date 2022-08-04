@@ -1,4 +1,4 @@
 COMPILER=gfortran
-$COMPILER -O3 ../atomgr_sa.F90 -o ../atomgr
+$COMPILER -O3 ../atomgr_sa.F90 -o ../../exe/atomgr
 ln -sf water_npt_10ps.dcd ./DCD
-../atomgr > result.gr
+../../exe/atomgr > result.gr
