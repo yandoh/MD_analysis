@@ -23,6 +23,7 @@
       real(8),allocatable :: mass(:,:), molmass(:)
       real(8),allocatable :: pos(:,:,:)
       real(8),allocatable :: cntmol0(:,:,:)
+      real(8) :: pi
 !dcd
       character(len=4)::Aname
       integer(4) :: nstr, nptot, iflame, nflame
@@ -32,6 +33,7 @@
 !dcd
 
 	molcount=0
+	pi=dacos(-1d0)
 	totnp=0
 !### input sysinfo ###
 	open(21,file='sys_info',status='old')
@@ -114,9 +116,15 @@
       alpha =cellstr(5)   ! cos(alpha)   by catdcd
       box(3)=cellstr(6)   ! |c|
 ! by catdcd
+    if(abs(alpha).le.1d0)then  ! cos(angle)
       alpha=acos(alpha)   ! rad
       beta =acos(beta)    ! rad
       gamma=acos(gamma)   ! rad
+    else  !! [degree]
+      alpha=alpha/180d0*pi
+      beta=beta/180d0*pi
+      gamma=gamma/180d0*pi
+    endif
 
 !### calc. COM ###
 	cntmol0=0d0
