@@ -10,8 +10,8 @@
 ! (3) ./DCD
 !
       implicit none
-      real(8),parameter :: dt=2d-15
-      real(8),parameter :: dcd_interval=500
+      real(8),parameter :: dt=1d-15
+      integer(4),parameter :: dcd_interval=500
       integer(4),parameter::ncopy=1
 !
       integer(4),allocatable::nav(:),nmv(:)
@@ -202,6 +202,8 @@
       enddo
 
 !### output msd ###
+      write(*,'(a,es10.3)') '# parameter: dt          =', dt
+      write(*,'(a,i10)')    '# parameter: dcd_interval=', dcd_interval
       write(*,'(a,i5,i10)') '#', komtot, nflame
       write(*,'(a       )') '#   t [ps]    D [cm^2/s]    msd   [A^2]'
       do dflame=0,nflame-1

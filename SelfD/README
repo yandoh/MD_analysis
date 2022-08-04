@@ -9,7 +9,7 @@ Steps in analysis
                       This file is extracted from .mdff file used in MD  
                       calculation.
 
-  ./DCD ... link for .dcd file by catdcd.
+  ./DCD ... The link to .dcd file concatenated by catdcd.
 
 (2) Calculation of self diffusion coefficient D.
 
