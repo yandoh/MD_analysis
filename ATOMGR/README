@@ -2,13 +2,13 @@ Steps in analysis
 
 (1) Prepareation of input file
 
-  ./sys_info ... A file which describes composition of calculation system.
+  ./sys_info  ... A file which describes composition of calculation system.
   ./atompairs ... A file which defines atom pairs to be analyzed.
-  ./DCD ... link for .dcd file by catdcd.
+  ./DCD       ... The link to .dcd file concatenated by catdcd.
 
-(2) Calculation of g(r) for atom pairs defined by ./atompairs file.
+(2) Calculation of g(r) for each atom pair defined by ./atompairs file.
 
-  gfortran -O3 atomgr.F90 -o ../exe/atomgr
+  gfortran -O3 atomgr_sa.F90 -o ../exe/atomgr
   ln -s (path for .dcd file)/aaa.dcd ./DCD
   ../exe/atomgr > result.gr
   
