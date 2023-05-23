@@ -1,0 +1,30 @@
+Steps in analysis
+
+(1) Prepareation of input file
+
+  ./sys_info ... A file which describes composition of calculation system.
+
+  ./DCD      ... link for .dcd file by catdcd.
+
+  ./massinfo.mdff ... A file which describes mass information 
+                      for each molecule species.
+                      This file is extracted from .mdff file used in MD  
+                      calculation.
+
+  ./molparts ... A file which describes a series of atom IDs for the atoms
+                 constituting a plane segment in a molecule.
+                 (i.e., six carbon atoms in a benzene ring)
+
+  ./vectors  ... A file which describes two vectors from which the normal
+                 vector to the plnane segment will be calculated. 
+                 The vectors are defined by the two pairs of atom IDs.
+                 Radial distance with which the nearest neighbor segments
+                 is detected is also specified.
+
+(2) Calculation of S for the pair of planes of segments detected 
+    in the nearest neighbor solvation shell.
+
+  gfortran -O3 sorder_sa.F90 -o ../exe/sorder
+  ln -s (path for .dcd file)/aaa.dcd ./DCD
+  ../exe/sorder > result.sod
+  
